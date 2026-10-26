@@ -1,0 +1,54 @@
+x-zenith:
+  catalog:
+    name: Twello Demo
+    description: Shared kanban boards with colourful sticky notes, task assignments, profiles, and editor or viewer access.
+    authors: [Isobel McRae]
+    source: https://github.com/isobelmcrae/twello-demo
+    website: https://github.com/isobelmcrae/twello-demo
+    license: UNLICENSED
+    tags: [Project management]
+    alternatives: [Trello]
+    detail: Twello Demo is a single-tenant workspace for teams to organise projects on shared boards. Create multiple boards and lists, move sticky-note tasks between stages, assign teammates, and track completion. Invite collaborators through expiring links with editor or viewer permissions. Owners can revoke invitations and remove members. Board changes refresh automatically, and conflicting task edits preserve your draft. Built with Next.js, shadcn/ui, Better Auth, and PostgreSQL. Email delivery and verification are temporarily disabled.
+  expose:
+    - { service: web, port: 3000, web: true }
+  env:
+    PGPASSWORD:
+      generate: '([A-Za-z0-9_-]{16})([A-Za-z0-9_-]{16})'
+      services: [web]
+    POSTGRES_PASSWORD:
+      alias: PGPASSWORD
+      services: [db]
+    BETTER_AUTH_SECRET:
+      generate: '([A-Za-z0-9_-]{16})([A-Za-z0-9_-]{16})([A-Za-z0-9_-]{16})'
+      services: [web]
+    BETTER_AUTH_URL:
+      alias: ZENITH_PUBLIC_URL
+      services: [web]
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: twello
+      PGDATABASE: twello
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: twello
+      POSTGRES_DB: twello
+    volumes:
+      - twello_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U twello -d twello"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  twello_data:

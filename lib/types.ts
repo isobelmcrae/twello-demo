@@ -1,0 +1,14 @@
+export type Role = "owner" | "editor" | "viewer";
+export type NoteColor = "yellow" | "pink" | "blue" | "green" | "violet";
+export const NOTE_COLORS: NoteColor[] = ["yellow", "pink", "blue", "green", "violet"];
+export type User = { id: string; name: string; email: string; image: string | null };
+export type Profile = { bio: string; avatarColor: NoteColor };
+export type BoardSummary = { id: string; title: string; description: string; color: NoteColor; role: Role; updatedAt: string; taskCount: number; completedCount: number; memberCount: number };
+export type Column = { id: string; title: string; position: number; isDone: boolean };
+export type Task = { id: string; boardId: string; columnId: string; title: string; description: string; color: NoteColor; position: number; dueDate: string | null; assigneeId: string | null; version: number; createdAt: string };
+export type Member = Pick<User, "id" | "name" | "image"> & { role: Role };
+export type BoardSnapshot = { board: BoardSummary; columns: Column[]; tasks: Task[]; members: Member[]; revision: number };
+export type Invite = { id: string; role: Exclude<Role, "owner">; expiresAt: string; createdAt: string };
+export type InvitePreview = { title: string; role: Exclude<Role, "owner">; expiresAt: string };
+export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string; code?: string };
+export type TaskInput = { title: string; description: string; color: NoteColor; dueDate: string | null; assigneeId: string | null };
